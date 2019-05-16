@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="adduser">
+
+    <form
+            action="/users/add"
+            method="post">
+
+        <div class="form-group col-xs-offset-4 col-xs-4 text-center">
+            <label for="username">Login:</label>
+            <input class="form-control" id="username" name="username" placeholder="Enter login" required
+                   type="text">
+        </div>
+        <div class="form-group col-xs-offset-4 col-xs-4 text-center">
+            <label for="firstName">Name:</label>
+            <input class="form-control" id="firstName" name="firstName" placeholder="Enter name"
+                   required
+                   type="text">
+        </div>
+        <div class="form-group col-xs-offset-4 col-xs-4 text-center">
+            <label for="email">E-mail:</label>
+            <input class="form-control" id="email" name="email" placeholder="Enter email" required
+                   type="email">
+        </div>
+        <div class="form-group col-xs-offset-4 col-xs-4 text-center">
+            <label for="password">Password</label>
+            <input class="form-control" id="password" name="password" placeholder="Enter password"
+                   required
+                   type="password">
+        </div>
+        <div class="form-group col-xs-offset-4 col-xs-4 text-center">
+            <label for="roles">Role:</label>
+            <select class="form-control" id="roles" multiple name="roles" required>
+                <th:block th:each="role : ${rolesFromServer}">
+
+                    <option name="id"
+                            th:text="${role.getAuthority()}"
+                            th:value="${role.getId()}">
+                    </option>
+
+                </th:block>
+            </select>
+        </div>
+        <div class="form-group col-xs-offset-4 col-xs-4 text-center">
+            <button class="btn btn-success" type="submit">Add new user</button>
+        </div>
+    </form>
+
+</div>
+</body>

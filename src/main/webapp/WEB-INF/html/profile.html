@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en"
+      layout:decorate="default" th:with="currentSidebar='user'"
+      xmlns:layout="http://www.thymeleaf.org/" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>User page</title>
+</head>
+
+<body>
+
+
+<div layout:fragment="content">
+    <h1 class="page-header">User page</h1>
+
+    <div th:text="${'Hello '+userAuthorizedLogin} + '!'"></div>
+</div>
+</body>
+
+</html>

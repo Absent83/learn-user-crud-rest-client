@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+>
+<body>
+<div th:fragment="mainsidebar">
+    <ul class="nav nav-sidebar">
+        <li
+                th:classappend="${currentSidebar == 'admin'} ? 'active'"
+                th:if="${#authorization.expression('hasAuthority(''ADMIN'')')}">
+            <a href="/users/list">
+                Admin
+                <span class="sr-only" th:if="${currentSidebar == 'admin'}">(current)</span></a>
+        </li>
+        <li th:classappend="${currentSidebar == 'user'} ? 'active'"><a href="/profile">User<span class="sr-only"
+                                                                                                 th:if="${currentSidebar == 'user'}">(current)</span></a>
+        </li>
+    </ul>
+</div>
+</body>

@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+
+<body>
+<div th:fragment="userlistjs">
+
+    <div class="table-responsive">
+        <table class="table table-striped" id="usertable">
+            <thead>
+            <tr>
+                <th>Id</th>
+                <th>Login</th>
+                <th>Name</th>
+                <th>E-mail</th>
+                <th>Roles</th>
+                <th>Password</th>
+                <th></th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody id="usertablebody">
+
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade"
+         id="usereditmodaljs"
+         role="dialog">
+
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button class="close" data-dismiss="modal" type="button">&times;</button>
+                    <h4 class="modal-title">Edit user </h4>
+                </div>
+
+
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <form
+                                id="userform"
+                                method="post">
+
+                            <div class="form-group col-xs-offset-4 col-xs-4 text-center">
+                                <label class="control-label" for="id">Id:</label>
+                                <input class="form-control" id="id" name="id" readonly required th:value="0"
+                                       type="number">
+                            </div>
+
+                            <div class="form-group col-xs-offset-4 col-xs-4 text-center">
+                                <label class="control-label" for="username">Login:</label>
+                                <input class="form-control" id="username" name="username" placeholder="Enter login"
+                                       required
+                                       th:value="username" type="text">
+                            </div>
+
+                            <div class="form-group col-xs-offset-4 col-xs-4 text-center">
+                                <label class="control-label" for="firstName">Name:</label>
+                                <input class="form-control" id="firstName" name="firstName" placeholder="Enter name"
+                                       required
+                                       th:value="firstName"
+                                       type="text">
+                            </div>
+
+                            <div class="form-group col-xs-offset-4 col-xs-4 text-center">
+                                <label class="control-label" for="email">E-mail:</label>
+                                <input class="form-control" id="email" name="email" placeholder="Enter email" required
+                                       th:value="email"
+                                       type="email">
+                            </div>
+
+                            <div class="form-group col-xs-offset-4 col-xs-4 text-center">
+                                <label class="control-label" for="password">Password</label>
+                                <input class="form-control" id="password" name="password" placeholder="Enter password"
+                                       required
+                                       th:value="password" type="password">
+                            </div>
+
+                            <div class="form-group col-xs-offset-4 col-xs-4 text-center">
+                                <label class="control-label" for="roles">Roles:</label>
+                                <select class="form-control" id="roles" multiple name="roles" required>
+
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+
+                <div class="modal-footer">
+                    <div class="form-group col-xs-offset-6 col-xs-6">
+
+                        <button
+                                class="btn btn-primary"
+                                form="userform"
+                                id="buttonUserUpdate"
+                                type="button">
+                            Edit user
+                        </button>
+
+                        <button class="btn btn-default" data-dismiss="modal" type="button">Закрыть</button>
+
+                    </div>
+                </div>
+
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+</body>

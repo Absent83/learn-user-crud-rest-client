@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="userlist(usersFromServer)">
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Id</th>
+                <th>Login</th>
+                <th>Name</th>
+                <th>E-mail</th>
+                <th>Roles</th>
+                <th>Password</th>
+                <th></th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <th:block th:each="user:${usersFromServer}">
+                <tr>
+                    <td th:text="${user.getId()}">
+                    </td>
+                    <td th:text="${user.getUsername()}">
+                    </td>
+                    <td th:text="${user.getFirstName()}">
+                    </td>
+                    <td th:text="${user.getEmail()}">
+                    </td>
+                    <td>
+                        <th:block th:each="role:${user.getRoles()}">
+                            <p th:text="${role.getAuthority()}"></p>
+                        </th:block>
+                    </td>
+                    <td th:text="${user.getPassword()}">
+                    </td>
+                    <td>
+                        <!-- Trigger the modal with a button -->
+                        <button class="btn btn-primary" data-target="#usereditmodal" data-toggle="modal"
+                                th:attrappend="data-target=${user.getId()}" type="button">Edit
+                        </button>
+
+                        <!-- Modal -->
+                        <div class="modal fade"
+                             id="usereditmodal"
+                             role="dialog"
+                             th:attrappend="id=${user.getId()}">
+
+                            <div class="modal-dialog">
+
+                                <!-- Modal content-->
+                                <div class="modal-content">
+                                    <div th:replace="edit::useredit(currentuser=${user},rolesFromServer=${rolesFromServer})"></div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <form>
+                            <button class="btn btn-danger" formaction="/users/delete" formmethod="post"
+                                    name="userId"
+                                    th:value="${user.getId()}" type="submit">
+                                Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            </th:block>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+</body>

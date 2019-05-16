@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="useredit(currentuser, rolesFromServer)">
+
+
+    <div class="modal-header">
+        <button class="close" data-dismiss="modal" type="button">&times;</button>
+        <h4 class="modal-title" th:text="${'Edit user '+currentuser.getUsername()}"></h4>
+    </div>
+
+
+    <div class="modal-body">
+        <div class="container-fluid">
+            <form
+                    id="userform"
+                    method="post"
+                    th:action="@{/users/edit}"
+                    th:attrappend="id=*{id}"
+                    th:object="${currentuser}">
+
+                <div class="form-group col-xs-offset-4 col-xs-4 text-center">
+                    <label class="control-label" for="id">Id:</label>
+                    <input class="form-control" id="id" name="id" readonly required th:value="*{id}"
+                           type="text">
+                </div>
+
+                <div class="form-group col-xs-offset-4 col-xs-4 text-center">
+                    <label class="control-label" for="username">Login:</label>
+                    <input class="form-control" id="username" name="username" placeholder="Enter login" required
+                           th:value="*{username}" type="text">
+                </div>
+
+                <div class="form-group col-xs-offset-4 col-xs-4 text-center">
+                    <label class="control-label" for="firstName">Name:</label>
+                    <input class="form-control" id="firstName" name="firstName" placeholder="Enter name" required
+                           th:value="*{firstName}"
+                           type="text">
+                </div>
+
+                <div class="form-group col-xs-offset-4 col-xs-4 text-center">
+                    <label class="control-label" for="email">E-mail:</label>
+                    <input class="form-control" id="email" name="email" placeholder="Enter email" required
+                           th:value="*{email}"
+                           type="email">
+                </div>
+
+                <div class="form-group col-xs-offset-4 col-xs-4 text-center">
+                    <label class="control-label" for="password">Password</label>
+                    <input class="form-control" id="password" name="password" placeholder="Enter password" required
+                           th:value="*{password}" type="password">
+                </div>
+
+                <div class="form-group col-xs-offset-4 col-xs-4 text-center">
+                    <label class="control-label" for="roles">Roles:</label>
+                    <select class="form-control" id="roles" multiple name="roles" required>
+                        <th:block th:each="role : ${rolesFromServer}">
+
+                            <option name="id"
+                                    th:selected="${currentuser.getRoles().contains(role)}"
+                                    th:text="${role.getAuthority()}"
+                                    th:value="${role.getId()}">
+                            </option>
+
+                        </th:block>
+                    </select>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <div class="modal-footer">
+        <div class="form-group col-xs-offset-6 col-xs-6">
+
+            <button
+                    class="btn btn-primary"
+                    form="userform"
+                    th:attrappend="form=${currentuser.getId()}"
+                    type="submit">
+                Edit user
+            </button>
+
+            <button class="btn btn-default" data-dismiss="modal" type="button">Закрыть</button>
+
+        </div>
+    </div>
+
+
+</div>
+</body>
