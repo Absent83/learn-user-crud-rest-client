@@ -57,7 +57,6 @@ public class AdminController {
         userService.update(user);
 
         RedirectView redirectView = new RedirectView("/users/list");
-        //redirectView.setStatusCode(HttpStatus.MOVED_PERMANENTLY);
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setView(redirectView);
 
@@ -85,13 +84,6 @@ public class AdminController {
         userService.add(user);
 
         return "redirect:/users/list";
-
-//        RedirectView redirectView = new RedirectView("/users/list");
-//        //redirectView.setStatusCode(HttpStatus.MOVED_PERMANENTLY);
-//        ModelAndView modelAndView = new ModelAndView();
-//        modelAndView.setView(redirectView);
-//
-//        return modelAndView;
     }
 
     @RequestMapping(path = "/users/delete")
@@ -103,7 +95,6 @@ public class AdminController {
             userService.delete(userId);
 
             RedirectView redirectView = new RedirectView("/users/list");
-            //redirectView.setStatusCode(HttpStatus.MOVED_PERMANENTLY);
             ModelAndView modelAndView = new ModelAndView();
             modelAndView.setView(redirectView);
 
