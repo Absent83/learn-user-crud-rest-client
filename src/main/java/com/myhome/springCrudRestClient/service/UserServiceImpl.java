@@ -1,10 +1,11 @@
 package com.myhome.springCrudRestClient.service;
 
-import com.myhome.springCrudRestClient.model.Role;
 import com.myhome.springCrudRestClient.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -30,9 +31,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<User> get(long id) {
         User user = restTemplate.getForObject("http://localhost:8081/api/users/" + id, User.class);
-
-        System.out.println("get user by id=" + id + "; response user=" + user.getUsername());
-
         return Optional.ofNullable(user);
     }
 
@@ -60,18 +58,14 @@ public class UserServiceImpl implements UserService {
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<List<User>>(){});
-        List<User> users = response.getBody();
 
-        return users;
+        return response.getBody();
     }
 
     @Override
     public void add(User user) {
-
-        System.out.println("add user: username=" + user.getUsername());
-
         HttpEntity<User> request = new HttpEntity<>(user);
-        User foo = restTemplate.postForObject("http://localhost:8081/api/users", request, User.class);
+        restTemplate.postForObject("http://localhost:8081/api/users", request, User.class);
     }
 
     @Override

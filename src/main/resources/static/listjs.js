@@ -274,20 +274,24 @@ function deleteUser(id) {
 
 function getData(obj) {
 
-    var data = {};
-    data['id'] = obj.find('input[id="id"]').val();
-    data['username'] = obj.find('input[id="username"]').val();
-    data['firstName'] = obj.find('input[id="firstName"]').val();
-    data['email'] = obj.find('input[id="email"]').val();
-    data['password'] = obj.find('input[id="password"]').val();
+    let user = {};
+    user['id'] = obj.find('input[id="id"]').val();
+    user['username'] = obj.find('input[id="username"]').val();
+    user['firstName'] = obj.find('input[id="firstName"]').val();
+    user['email'] = obj.find('input[id="email"]').val();
+    user['password'] = obj.find('input[id="password"]').val();
 
-    data['roles'] = [];
+    user['roles'] = [];
 
     obj.find('option:selected').each(function () {
 
-        data['roles'].push(parseInt(this.value));
+        let role = {};
 
+        role['id']= parseInt(this.value);
+        role['authority']= this.text;
+
+        user['roles'].push(role);
     });
 
-    return data;
+    return user;
 }

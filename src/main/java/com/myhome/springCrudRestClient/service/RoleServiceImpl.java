@@ -3,7 +3,6 @@ package com.myhome.springCrudRestClient.service;
 import com.myhome.springCrudRestClient.model.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequestFactory;
@@ -39,17 +38,13 @@ public class RoleServiceImpl implements RoleService {
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<List<Role>>(){});
-        List<Role> roles = response.getBody();
 
-        return roles;
+        return response.getBody();
     }
 
     @Override
     public Optional<Role> get(long id) {
         Role role = restTemplate.getForObject("http://localhost:8081/api/roles/" + id, Role.class);
-
-        System.out.println("get role by id=" + id + "; response role=" + role.getAuthority());
-
         return Optional.ofNullable(role);
     }
 

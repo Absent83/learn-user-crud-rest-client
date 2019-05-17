@@ -41,7 +41,6 @@ public class AdminController {
         List<User> users = userService.getAll();
 
         ModelAndView modelAndView = new ModelAndView();
-//        modelAndView.setViewName("list");
         modelAndView.setViewName("adminpage");
         modelAndView.addObject("usersFromServer", users);
         modelAndView.addObject("rolesFromServer", roleService.getAll());
@@ -79,12 +78,11 @@ public class AdminController {
     @PostMapping(path = "/users/add")
     public String addUserSubmit(User user) {
 
-        user.setId(0L); //todo
-
         userService.add(user);
 
         return "redirect:/users/list";
     }
+
 
     @RequestMapping(path = "/users/delete")
     public ModelAndView deleteUser(HttpServletRequest request, HttpServletResponse response) {

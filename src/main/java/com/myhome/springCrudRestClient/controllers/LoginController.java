@@ -15,7 +15,6 @@ public class LoginController {
 
     @GetMapping(path = {"/login", "", "/"})
     public String getLoginPage(ModelMap model, HttpServletRequest httpServletRequest) {
-        System.out.println("getLoginPage");
         if (httpServletRequest.getParameterMap().containsKey("error")){
             model.addAttribute("error", true);
         }
