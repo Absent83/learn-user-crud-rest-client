@@ -11,7 +11,7 @@ import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class User implements UserDetails {
-    private Long id;
+    private Long id = -1L;
 
     private String username;
 
