@@ -1,9 +1,12 @@
 package com.myhome.springCrudRestClient.configuration;
 
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -12,6 +15,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.nio.charset.Charset;
 
 /**
  * @author Nick Dolgopolov (nick_kerch@mail.ru; https://github.com/Absent83/)
@@ -95,13 +100,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .logoutUrl("/logout");
     }
 
-    @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        System.out.println("=== SecurityConfig === === configureGlobal ===");
-        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
 
-//        auth.inMemoryAuthentication().withUser("admin").password("password").roles("ADMIN");
-//        auth.inMemoryAuthentication().withUser("1").password("1").roles("ADMIN");
+    @Autowired
+    @Override
+    public void configure(AuthenticationManagerBuilder auth) throws Exception {
+        System.out.println("=== SecurityConfig === === configure AuthenticationManagerBuilder ===");
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
     }
 
 
@@ -134,5 +138,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //        return encoder;
 //    }
 
+
+    @Bean
+    HttpHeaders createHeaders(){
+
+
+        String plainCreds = "admin" + ":" + "adminpassword";
+        byte[] plainCredsBytes = plainCreds.getBytes(Charset.forName("US-ASCII"));
+        byte[] base64CredsBytes = Base64.encodeBase64(plainCredsBytes);
+        String base64Creds = new String(base64CredsBytes);
+        String authHeader = "Basic " + base64Creds;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", authHeader);
+        return headers;
+    }
 }
 

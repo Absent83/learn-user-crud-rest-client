@@ -1,11 +1,12 @@
 package com.myhome.springCrudRestClient.service;
 
 import com.myhome.springCrudRestClient.model.Role;
-import com.myhome.springCrudRestClient.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -21,7 +22,13 @@ import java.util.Optional;
 @Component
 public class RoleServiceImpl implements RoleService {
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
+
+
+    @Autowired
+    public RoleServiceImpl(ClientHttpRequestFactory clientHttpRequestFactory) {
+        restTemplate = new RestTemplate(clientHttpRequestFactory);
+    }
 
 
     @Override

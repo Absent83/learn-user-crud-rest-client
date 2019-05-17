@@ -18,7 +18,13 @@ import java.util.Optional;
 //@Component
 public class UserServiceImpl implements UserService {
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
+
+
+    @Autowired
+    public UserServiceImpl(ClientHttpRequestFactory clientHttpRequestFactory) {
+        restTemplate = new RestTemplate(clientHttpRequestFactory);
+    }
 
 
     @Override
