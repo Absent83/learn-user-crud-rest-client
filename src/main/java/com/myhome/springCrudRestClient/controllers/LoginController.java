@@ -10,15 +10,16 @@ import javax.servlet.http.HttpServletRequest;
  * @author Nick Dolgopolov (nick_kerch@mail.ru; https://github.com/Absent83/)
  */
 
-@Controller
-public class LoginController {
-
-    @GetMapping(path = {"/login", "", "/"})
-    public String getLoginPage(ModelMap model, HttpServletRequest httpServletRequest) {
-        if (httpServletRequest.getParameterMap().containsKey("error")){
-            model.addAttribute("error", true);
-        }
-
-        return "login";
-    }
-}
+//@Controller
+//public class LoginController {
+//
+////    @GetMapping(path = {"/login", "", "/"}) //todo
+//    @GetMapping(path = {"/login"})
+//    public String getLoginPage(ModelMap model, HttpServletRequest httpServletRequest) {
+//        if (httpServletRequest.getParameterMap().containsKey("error")){
+//            model.addAttribute("error", true);
+//        }
+//
+//        return "login";
+//    }
+//}

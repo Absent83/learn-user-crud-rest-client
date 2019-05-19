@@ -27,34 +27,35 @@ public class UserServiceImpl implements UserService {
         restTemplate = new RestTemplate(clientHttpRequestFactory);
     }
 
-
     @Override
     public Optional<User> get(long id) {
-        User user = restTemplate.getForObject("http://localhost:8081/api/users/" + id, User.class);
+        User user = restTemplate.getForObject("http://localhost:8082/api/users/" + id, User.class);
         return Optional.ofNullable(user);
     }
 
     @Override
     public Optional<User> getByUsername(String username) {
 
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("http://localhost:8081/api/users/")
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("http://localhost:8082/api/users/")
                 .queryParam("username", username);
 
-        ResponseEntity<List<User>> response = restTemplate.exchange(
-                builder.toUriString(),
-                HttpMethod.GET,
-                null,
-                new ParameterizedTypeReference<List<User>>(){});
-        List<User> users = response.getBody();
-
-        return Optional.ofNullable(users.get(0));
+        return Optional.ofNullable(getUser(builder));
     }
 
+    @Override
+    public Optional<User> getByEmail(String email) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("http://localhost:8082/api/users/")
+                .queryParam("email", email);
+
+        User user = getUser(builder);
+
+        return Optional.ofNullable(user);
+    }
 
     @Override
     public List<User> getAll() {
         ResponseEntity<List<User>> response = restTemplate.exchange(
-                "http://localhost:8081/api/users",
+                "http://localhost:8082/api/users",
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<List<User>>(){});
@@ -65,17 +66,28 @@ public class UserServiceImpl implements UserService {
     @Override
     public void add(User user) {
         HttpEntity<User> request = new HttpEntity<>(user);
-        restTemplate.postForObject("http://localhost:8081/api/users", request, User.class);
+        restTemplate.postForObject("http://localhost:8082/api/users", request, User.class);
     }
 
     @Override
     public void update(User user) {
         HttpEntity<User> requestUpdate = new HttpEntity<>(user);
-        restTemplate.exchange("http://localhost:8081/api/users/" + user.getId(), HttpMethod.PUT, requestUpdate, User.class);
+        restTemplate.exchange("http://localhost:8082/api/users/" + user.getId(), HttpMethod.PUT, requestUpdate, User.class);
     }
 
     @Override
     public void delete(long id) {
-        restTemplate.delete("http://localhost:8081/api/users/" + id);
+        restTemplate.delete("http://localhost:8082/api/users/" + id);
+    }
+
+    private User getUser(UriComponentsBuilder builder) {
+        ResponseEntity<User> response = restTemplate.exchange(
+                builder.toUriString(),
+                HttpMethod.GET,
+                null,
+                User.class);
+        User user = response.getBody();
+
+        return user;
     }
 }

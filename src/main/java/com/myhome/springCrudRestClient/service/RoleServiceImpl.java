@@ -34,7 +34,7 @@ public class RoleServiceImpl implements RoleService {
     public List<Role> getAll() {
 
         ResponseEntity<List<Role>> response = restTemplate.exchange(
-                "http://localhost:8081/api/roles",
+                "http://localhost:8082/api/roles",
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<List<Role>>(){});
@@ -44,23 +44,23 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public Optional<Role> get(long id) {
-        Role role = restTemplate.getForObject("http://localhost:8081/api/roles/" + id, Role.class);
+        Role role = restTemplate.getForObject("http://localhost:8082/api/roles/" + id, Role.class);
         return Optional.ofNullable(role);
     }
 
     @Override
     public Optional<Role> getByAuthority(String authority) {
 
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("http://localhost:8081/api/roles")
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("http://localhost:8082/api/roles")
                 .queryParam("authority", authority);
 
-        ResponseEntity<List<Role>> response = restTemplate.exchange(
+        ResponseEntity<Role> response = restTemplate.exchange(
                 builder.toUriString(),
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<List<Role>>(){});
-        List<Role> roles = response.getBody();
+                Role.class);
+        Role role = response.getBody();
 
-        return Optional.ofNullable(roles.get(0));
+        return Optional.ofNullable(role);
     }
 }

@@ -9,6 +9,7 @@ import java.util.Optional;
 public interface UserService {
     Optional<User> get(long id);
     Optional<User> getByUsername(String userName);
+    Optional<User> getByEmail(String userName);
 
     List<User> getAll();
 
