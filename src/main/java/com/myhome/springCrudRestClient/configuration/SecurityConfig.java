@@ -71,18 +71,18 @@ public class SecurityConfig
         return new GoogleAuthoritiesExtractor();
     }
 
-            @Autowired
-        @Override
-        public void configure(AuthenticationManagerBuilder auth) throws Exception {
-            System.out.println("=== SecurityConfig === === configure AuthenticationManagerBuilder ===");
-            auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
-        }
+    @Autowired
+    @Override
+    public void configure(AuthenticationManagerBuilder auth) throws Exception {
+        System.out.println("=== SecurityConfig === === configure AuthenticationManagerBuilder ===");
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+    }
 
 
-        @Bean
-        public PasswordEncoder passwordEncoder(){
-            return NoOpPasswordEncoder.getInstance();
-        }
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return NoOpPasswordEncoder.getInstance();
+    }
 }
 
 

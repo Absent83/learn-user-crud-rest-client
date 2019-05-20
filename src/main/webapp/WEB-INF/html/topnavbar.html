@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"
+<html lang="ru"
       xmlns:th="http://www.thymeleaf.org">
 <body>
 <div th:fragment="mainnavbar">
@@ -24,7 +24,7 @@
                     </li>
                     <li>
                         <form>
-                            <button class="btn btn-danger" formaction="/logout" formmethod="post" type="submit">
+                            <button class="btn btn-link align-baseline" formaction="/logout" formmethod="post" type="submit">
                                 Logout form button POST
                             </button>
                             <input type="hidden"
@@ -33,7 +33,7 @@
                         </form>
                     </li>
                     <li>
-                        <button onClick="logout()">Logout JS POST</button>
+                        <button class="btn btn-link p-0 m-0 d-inline align-baseline" onClick="logout()">Logout JS POST</button>
                     </li>
                 </ul>
             </div>
