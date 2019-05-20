@@ -11,11 +11,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 /**
  * @author Nick Dolgopolov (nick_kerch@mail.ru; https://github.com/Absent83/)
@@ -32,23 +34,31 @@ public class SecurityConfig
     UserDetailsService userDetailsService;
 
     @Override
+    public void configure(WebSecurity web) {
+        web.ignoring().antMatchers("/"); //не использовать цепочки фильтров (отключается Security) для указанных url (для общих ресурсов)
+    }
+
+    @Override
     protected void configure(HttpSecurity http)
             throws Exception {
 
-        http.csrf().disable()
-                //.antMatcher("/**")
+        http.
+                csrf().disable()
+                .antMatcher("/**")
+                .authorizeRequests()
+                    .antMatchers("/", "/login**", "/profile", "/webjars/**", "/error**")
+                    .permitAll()
+                    .and()
                 .authorizeRequests()
                     .antMatchers("/users/**", "/users")
                     .hasAuthority("ADMIN")
                     .and()
-                .authorizeRequests()
-                    .antMatchers("/login**", "/profile")
-                    .permitAll()
-                .and()
 //                .anyRequest()
 //                    .authenticated()
 //                    .and()
-                .formLogin().disable();
+                .formLogin().disable()
+                .logout().logoutSuccessUrl("/").permitAll()
+                .and().csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
     }
 
     @Bean

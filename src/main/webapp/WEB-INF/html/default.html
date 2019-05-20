@@ -19,6 +19,37 @@
 
     <!-- Custom styles for this template -->
     <link href="/dashboard.css" rel="stylesheet">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+
+    <script type="text/javascript" src="/webjars/js-cookie/js.cookie.js"></script>
+
+    <script>
+        $.ajaxSetup({
+            beforeSend : function(xhr, settings) {
+                if (settings.type == 'POST' || settings.type == 'PUT'
+                    || settings.type == 'DELETE') {
+                    if (!(/^http:.*/.test(settings.url) || /^https:.*/
+                        .test(settings.url))) {
+                        // Only send the token to relative URLs i.e. locally.
+                        xhr.setRequestHeader("X-XSRF-TOKEN",
+                            Cookies.get('XSRF-TOKEN'));
+                        console.log("add cookie")
+                    }
+                }
+            }
+        });
+    </script>
+
+    <script>
+        var logout = function() {
+            $.post("/logout", function() {
+                location="http://localhost:8080"
+            });
+            return true;
+        }
+    </script>
 </head>
 
 

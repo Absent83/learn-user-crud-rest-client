@@ -47,6 +47,9 @@ public class GooglePrincipalExtractor implements PrincipalExtractor {
             return newUser;
         });
 
+        System.out.println("===> extractPrincipal <===");
+        System.out.println("user: " + user.getId() + " " + user.getUsername());
+
         return user;
     }
 }

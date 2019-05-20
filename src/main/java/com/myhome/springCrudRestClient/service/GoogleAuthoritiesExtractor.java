@@ -44,6 +44,9 @@ public class GoogleAuthoritiesExtractor implements AuthoritiesExtractor {
             return newUser;
         });
 
+        System.out.println("===> extractAuthorities <===");
+        user.getAuthorities().forEach(o -> System.out.println(o.getAuthority()));
+
         return new ArrayList(user.getAuthorities());
 
     }
