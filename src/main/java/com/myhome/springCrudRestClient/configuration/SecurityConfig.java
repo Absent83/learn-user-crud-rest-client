@@ -3,9 +3,7 @@ package com.myhome.springCrudRestClient.configuration;
 import com.myhome.springCrudRestClient.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.AuthoritiesExtractor;
-import org.springframework.boot.autoconfigure.security.oauth2.resource.PrincipalExtractor;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -151,15 +149,6 @@ public class SecurityConfig
                 .addFilterBefore(ssoFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 
-//    @Bean
-//    public PrincipalExtractor googlePrincipalExtractor() {
-//        return new GooglePrincipalExtractor();
-//    }
-//
-//    @Bean
-//    public AuthoritiesExtractor googleAuthoritiesExtractor() {
-//        return new GoogleAuthoritiesExtractor();
-//    }
 
     @Autowired
     @Override

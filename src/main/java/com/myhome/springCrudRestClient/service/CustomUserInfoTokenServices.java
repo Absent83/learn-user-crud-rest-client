@@ -1,4 +1,4 @@
-package com.myhome.springCrudRestClient.configuration;
+package com.myhome.springCrudRestClient.service;
 
 import com.myhome.springCrudRestClient.model.Role;
 import com.myhome.springCrudRestClient.model.User;
