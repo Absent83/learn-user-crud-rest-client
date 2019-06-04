@@ -1,12 +1,14 @@
 package com.myhome.springCrudRestClient.configuration;
 
-import com.myhome.springCrudRestClient.service.GoogleAuthoritiesExtractor;
-import com.myhome.springCrudRestClient.service.GooglePrincipalExtractor;
+import com.myhome.springCrudRestClient.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.AuthoritiesExtractor;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.PrincipalExtractor;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -17,7 +19,16 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.OAuth2ClientContext;
+import org.springframework.security.oauth2.client.OAuth2RestTemplate;
+import org.springframework.security.oauth2.client.filter.OAuth2ClientAuthenticationProcessingFilter;
+import org.springframework.security.oauth2.client.filter.OAuth2ClientContextFilter;
+import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeResourceDetails;
+import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+
+import javax.servlet.Filter;
 
 /**
  * @author Nick Dolgopolov (nick_kerch@mail.ru; https://github.com/Absent83/)
@@ -25,13 +36,72 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity(debug = true)
-@EnableOAuth2Sso
+@EnableOAuth2Client
+//@EnableOAuth2Sso
 public class SecurityConfig
         extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    private AuthProvider authProvider;
 
     @Qualifier("userDetailsServiceImpl")
     @Autowired
     UserDetailsService userDetailsService;
+
+    @Autowired
+    UserService userService;
+
+    @Autowired
+    RoleService roleService;
+
+    @Autowired
+    @Qualifier("oauth2ClientContext")
+    private OAuth2ClientContext oAuth2ClientContext;
+
+    @Autowired
+    private AuthoritiesExtractor authoritiesExtractor;
+
+
+    @Bean
+    @ConfigurationProperties("google.client")
+    public AuthorizationCodeResourceDetails google()
+    {
+        return new AuthorizationCodeResourceDetails();
+    }
+
+
+    @Bean
+    @ConfigurationProperties("google.resource")
+    public ResourceServerProperties googleResource()
+    {
+        return new ResourceServerProperties();
+    }
+
+
+    @Bean
+    public FilterRegistrationBean oAuth2ClientFilterRegistration(OAuth2ClientContextFilter oAuth2ClientContextFilter)
+    {
+        FilterRegistrationBean registration = new FilterRegistrationBean();
+        registration.setFilter(oAuth2ClientContextFilter);
+        registration.setOrder(-100);
+        return registration;
+    }
+
+
+    private Filter ssoFilter() {
+        OAuth2ClientAuthenticationProcessingFilter googleFilter = new OAuth2ClientAuthenticationProcessingFilter("/login/google");
+        OAuth2RestTemplate googleTemplate = new OAuth2RestTemplate(google(), oAuth2ClientContext);
+        googleFilter.setRestTemplate(googleTemplate);
+        CustomUserInfoTokenServices tokenServices = new CustomUserInfoTokenServices(googleResource().getUserInfoUri(), google().getClientId());
+        tokenServices.setRestTemplate(googleTemplate);
+        googleFilter.setTokenServices(tokenServices);
+        tokenServices.setUserService(userService);
+        tokenServices.setRoleService(roleService);
+        tokenServices.setAuthoritiesExtractor(authoritiesExtractor);
+        tokenServices.setPasswordEncoder(passwordEncoder());
+        return googleFilter;
+    }
+
 
     @Override
     public void configure(WebSecurity web) {
@@ -42,40 +112,61 @@ public class SecurityConfig
     protected void configure(HttpSecurity http)
             throws Exception {
 
-        http.
-                csrf().disable()
+        //@formatter:off
+        http
                 .antMatcher("/**")
+                .csrf()
+                    .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                    .and()
                 .authorizeRequests()
-                    .antMatchers("/", "/login**", "/profile", "/webjars/**", "/error**")
+                    .antMatchers("/", "/login", "/login/google", "/login**", "/login/*", "/profile", "/webjars/**", "/error**")
                     .permitAll()
                     .and()
                 .authorizeRequests()
-                    .antMatchers("/users/**", "/users")
+                    .antMatchers("/users/**", "/users" , "/users/*")
                     .hasAuthority("ADMIN")
                     .and()
 //                .anyRequest()
 //                    .authenticated()
 //                    .and()
-                .formLogin().disable()
-                .logout().logoutSuccessUrl("/").permitAll()
-                .and().csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+                .anonymous()
+                    .authorities("ROLE_ANONYMOUS")
+                    .principal("MyAnonimUser")
+                    .and()
+                .formLogin()
+                    .loginPage("/login")
+                    .failureUrl("/login?error")
+                    .defaultSuccessUrl("/profile")
+                    .usernameParameter("username")
+                    .passwordParameter("password")
+                    .and()
+                .logout()
+                    .logoutSuccessUrl("/")
+                    .logoutUrl("/logout")
+                    .permitAll()
+                .and();
+        //@formatter:on
+
+        http
+                .addFilterBefore(ssoFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 
-    @Bean
-    public PrincipalExtractor googlePrincipalExtractor() {
-        return new GooglePrincipalExtractor();
-    }
-
-    @Bean
-    public AuthoritiesExtractor googleAuthoritiesExtractor() {
-        return new GoogleAuthoritiesExtractor();
-    }
+//    @Bean
+//    public PrincipalExtractor googlePrincipalExtractor() {
+//        return new GooglePrincipalExtractor();
+//    }
+//
+//    @Bean
+//    public AuthoritiesExtractor googleAuthoritiesExtractor() {
+//        return new GoogleAuthoritiesExtractor();
+//    }
 
     @Autowired
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
         System.out.println("=== SecurityConfig === === configure AuthenticationManagerBuilder ===");
-        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+        //auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+        auth.authenticationProvider(authProvider);
     }
 
 
@@ -84,165 +175,3 @@ public class SecurityConfig
         return NoOpPasswordEncoder.getInstance();
     }
 }
-
-
-
-//
-//@Configuration
-//@EnableWebSecurity(debug = true)
-//@EnableOAuth2Sso
-//public class SecurityConfig {
-//
-//
-//
-//
-////    @Configuration
-////    @Order(1)
-////    public static class App1ConfigurationAdapter extends WebSecurityConfigurerAdapter {
-////
-////        private final
-////        UserDetailsService userDetailsService;
-////
-////
-////        @Autowired
-////        public App1ConfigurationAdapter(@Qualifier("userDetailsServiceImpl") UserDetailsService userDetailsService) {
-////            this.userDetailsService = userDetailsService;
-////        }
-////
-////
-////        @Override
-////        public void configure(WebSecurity web) {
-////            web.ignoring().antMatchers("/"); //не использовать цепочки фильтров (отключается Security) для указанных url (для общих ресурсов)
-////        }
-////
-////
-////        @Override
-////        protected void configure(HttpSecurity http) throws Exception {
-////
-////            http.csrf().disable()
-////
-////                    //без сессий (для REST)
-//////                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//////                .and()
-////
-////                    //порядок матчеров имее значение: сработает тот, который первый.
-////                    //добавляет фильтр ананонимной аутентификации.
-//////                .authorizeRequests().antMatchers("/public").anonymous()
-//////                .and()
-////
-//////                .authorizeRequests().antMatchers("/authorized").authenticated()
-//////                .and()
-////
-////                    .authorizeRequests()
-////                        .antMatchers("/users/**", "/users")
-////                        .hasAuthority("ADMIN")
-////                        .and()
-////
-////                    .authorizeRequests()
-////                        .antMatchers("/profile")
-////                        .permitAll()
-////                        //.authenticated()
-////                        .and()
-////
-//////                .authorizeRequests()
-//////                    .antMatchers("/profile")
-//////                    .anonymous()
-//////                    .and()
-////
-////                    .anonymous()
-////                        .authorities("ROLE_ANONYMOUS")
-////                        .principal("anonim")
-////                        .and()
-////
-////                    //запрашивает login-password из head (открывает окно аутентификации)
-////                    //.httpBasic();
-////
-////                    .formLogin()
-////                        .loginPage("/login")
-////                        .failureUrl("/login?error")
-////                        .defaultSuccessUrl("/profile")
-////                        .usernameParameter("username")
-////                        .passwordParameter("password")
-////                        .and()
-////
-//////                .rememberMe()
-//////                .key("myAppKey")
-//////                .tokenValiditySeconds(60)
-//////                  .and()
-////
-////                    .logout()
-////                        .logoutUrl("/logout");
-////        }
-////
-////
-////        @Autowired
-////        @Override
-////        public void configure(AuthenticationManagerBuilder auth) throws Exception {
-////            System.out.println("=== SecurityConfig === === configure AuthenticationManagerBuilder ===");
-////            auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
-////        }
-////
-////
-////        @Bean
-////        public PasswordEncoder passwordEncoder(){
-////            return NoOpPasswordEncoder.getInstance();
-////        }
-////
-////
-////        @Bean
-////        HttpHeaders createHeaders(){
-////            String plainCreds = "admin" + ":" + "adminpassword";
-////            byte[] plainCredsBytes = plainCreds.getBytes(Charset.forName("US-ASCII"));
-////            byte[] base64CredsBytes = Base64.encodeBase64(plainCredsBytes);
-////            String base64Creds = new String(base64CredsBytes);
-////            String authHeader = "Basic " + base64Creds;
-////
-////            HttpHeaders headers = new HttpHeaders();
-////            headers.add("Authorization", authHeader);
-////            return headers;
-////        }
-////    }
-//
-//
-//    @Configuration
-//    @Order(1)
-//    public static class App2ConfigurationAdapter extends WebSecurityConfigurerAdapter {
-//
-//        @Override
-//        protected void configure(HttpSecurity http) throws Exception {
-////            http
-////                    .csrf().disable().antMatcher("/**")
-////
-////                    .authorizeRequests()
-////                    .antMatchers("/users/**", "/users")
-////                    .hasAuthority("ADMIN")
-////                    .and()
-////
-////                    .oauth2Login()
-//////                        .loginPage("/login/oauth2")
-////
-////                    .redirectionEndpoint()
-////                        .baseUri("/oauth2/callback/*")
-////                    .and()
-////                    .userInfoEndpoint()
-////                    .and()
-////                    .authorizationEndpoint()
-////                    .baseUri("/oauth2/authorize");
-//
-//            http
-//                    .antMatcher("/**")
-//                    .authorizeRequests()
-//                    .antMatchers("/", "/login**", "/webjars/**", "/error**")
-//                    .permitAll()
-//                    .anyRequest()
-//                    .authenticated();
-//        }
-//
-//        @Bean
-//        public PrincipalExtractor githubPrincipalExtractor() {
-//            return new GooglePrincipalExtractor();
-//        }
-//
-//
-//    }
-//}
