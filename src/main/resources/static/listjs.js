@@ -142,7 +142,7 @@ function createModalCallBacks() {
 
 
         let modalheader = $(event.currentTarget).find('.modal-header');
-        modalheader.find('.modal-title').text('Edit user ' + button.data('firstname'));
+        modalheader.find('.modal-title').text('Edit user ' + button.data('username'));
 
 
         let modalbody = $(event.currentTarget).find('.modal-body');
@@ -215,12 +215,11 @@ function addUser(jsonToSend) {
     $.ajax(
         {
             url: api_url + '/users',
-            async: false,
             type: "POST",
             data: jsonToSend,
             contentType: "application/json",
-            dataType: 'json'
-
+            dataType: 'json',
+            async: false
         })
         .done(function () {
             console.log("success: finish add user");

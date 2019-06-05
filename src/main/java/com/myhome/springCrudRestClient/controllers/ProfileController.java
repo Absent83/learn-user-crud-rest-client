@@ -22,10 +22,12 @@ public class ProfileController {
 
         String name;
 
-        if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof User) {
-            name = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+        Object userCandidate = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (userCandidate instanceof User) {
+            name = ((User) userCandidate).getUsername();
         } else {
-            name = "annnnnnnnonim";
+            name = userCandidate.toString() + "(NOT instanceof User)";
         }
 
         modelAndView.addObject("userAuthorizedLogin", name);

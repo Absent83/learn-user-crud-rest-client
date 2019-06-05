@@ -4,6 +4,7 @@ import com.myhome.springCrudRestClient.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.AuthoritiesExtractor;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.PrincipalExtractor;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -33,7 +34,7 @@ import javax.servlet.Filter;
  */
 
 @Configuration
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity
 @EnableOAuth2Client
 //@EnableOAuth2Sso
 public class SecurityConfig
@@ -58,6 +59,9 @@ public class SecurityConfig
 
     @Autowired
     private AuthoritiesExtractor authoritiesExtractor;
+
+    @Autowired
+    PrincipalExtractor principalExtractor;
 
 
     @Bean
@@ -96,6 +100,7 @@ public class SecurityConfig
         tokenServices.setUserService(userService);
         tokenServices.setRoleService(roleService);
         tokenServices.setAuthoritiesExtractor(authoritiesExtractor);
+        tokenServices.setPrincipalExtractor(principalExtractor);
         tokenServices.setPasswordEncoder(passwordEncoder());
         return googleFilter;
     }
@@ -116,21 +121,26 @@ public class SecurityConfig
                 .csrf()
                     .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                     .and()
-                .authorizeRequests()
-                    .antMatchers("/", "/login", "/login/google", "/login**", "/login/*", "/profile", "/webjars/**", "/error**")
-                    .permitAll()
-                    .and()
-                .authorizeRequests()
-                    .antMatchers("/users/**", "/users" , "/users/*")
-                    .hasAuthority("ADMIN")
-                    .and()
-//                .anyRequest()
-//                    .authenticated()
-//                    .and()
                 .anonymous()
                     .authorities("ROLE_ANONYMOUS")
                     .principal("MyAnonimUser")
                     .and()
+                .authorizeRequests()
+                    .antMatchers("/", "/login", "/login/google", "/login**", "/login/*", "/webjars/**", "/error**")
+                    .permitAll()
+                    .and()
+                .authorizeRequests()
+                    .antMatchers("/users/**", "/users" , "/users/*", "/api/**", "/api/users/**", "/api/**/", "/api" , "/api/*")
+                    .hasAuthority("ADMIN")
+                    .and()
+                .authorizeRequests()
+                    .antMatchers("/profile")
+                    .permitAll()
+                    .and()
+//                .anyRequest()
+//                    .authenticated()
+//                    .and()
+
                 .formLogin()
                     .loginPage("/login")
                     .failureUrl("/login?error")
@@ -142,7 +152,8 @@ public class SecurityConfig
                     .logoutSuccessUrl("/")
                     .logoutUrl("/logout")
                     .permitAll()
-                .and();
+                    .and();
+
         //@formatter:on
 
         http

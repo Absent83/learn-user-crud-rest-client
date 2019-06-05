@@ -1,6 +1,5 @@
 package com.myhome.springCrudRestClient.service;
 
-import com.myhome.springCrudRestClient.model.Role;
 import com.myhome.springCrudRestClient.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.AuthoritiesExtractor;
