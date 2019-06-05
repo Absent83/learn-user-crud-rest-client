@@ -24,16 +24,21 @@
                     </li>
                     <li>
                         <form>
-                            <button class="btn btn-link align-baseline" formaction="/logout" formmethod="post" type="submit">
-                                Logout form button POST
-                            </button>
+                            <p class="navbar-btn">
+                                <button class="btn btn-link" formaction="/logout" formmethod="post" type="submit">
+                                    Logout form button POST
+                                </button>
+                            </p>
+
                             <input type="hidden"
                                    th:name="${_csrf.parameterName}"
                                    th:value="${_csrf.token}" />
                         </form>
                     </li>
                     <li>
-                        <button class="btn btn-link p-0 m-0 d-inline align-baseline" onClick="logout()">Logout JS POST</button>
+                        <p class="navbar-btn">
+                            <button class="btn btn-link logout-button" onClick="logout()">Logout JS POST</button>
+                        </p>
                     </li>
                 </ul>
             </div>

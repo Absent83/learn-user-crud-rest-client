@@ -14,39 +14,33 @@ import org.springframework.stereotype.Component;
 import java.util.Collection;
 
 @Component
-public class AuthProvider implements AuthenticationProvider
-{
-	@Autowired
-	private UserService userService;
+public class AuthProvider implements AuthenticationProvider {
+    @Autowired
+    private UserService userService;
 
-	@Autowired
-	private PasswordEncoder passwordEncoder;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-	public Authentication authenticate(Authentication authentication) throws AuthenticationException
-	{
-		String username = authentication.getName();
-		String password = (String) authentication.getCredentials();
+    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        String username = authentication.getName();
+        String password = (String) authentication.getCredentials();
 
 
-		User user = userService.getByUsername(username).orElseThrow(() -> new BadCredentialsException("Username not found"));
+        User user = userService.getByUsername(username).orElseThrow(() -> new BadCredentialsException("Username not found"));
 
-		if(user != null && (user.getUsername().equals(username) || user.getUsername().equals(username)))
-		{
-			if(!passwordEncoder.matches(password, user.getPassword()))
-			{
-				throw new BadCredentialsException("Wrong password");
-			}
+        if (user != null && (user.getUsername().equals(username) || user.getUsername().equals(username))) {
+            if (!passwordEncoder.matches(password, user.getPassword())) {
+                throw new BadCredentialsException("Wrong password");
+            }
 
-			Collection<? extends GrantedAuthority> authorities = user.getAuthorities();
+            Collection<? extends GrantedAuthority> authorities = user.getAuthorities();
 
-			return new UsernamePasswordAuthenticationToken(user, password, authorities);
-		}
-		else
-			throw new BadCredentialsException("Username not found");
-	}
+            return new UsernamePasswordAuthenticationToken(user, password, authorities);
+        } else
+            throw new BadCredentialsException("Username not found");
+    }
 
-	public boolean supports(Class<?> arg)
-	{
-		return true;
-	}
+    public boolean supports(Class<?> arg) {
+        return true;
+    }
 }

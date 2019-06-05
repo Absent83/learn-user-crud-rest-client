@@ -61,7 +61,7 @@ public class SecurityConfig
     private AuthoritiesExtractor authoritiesExtractor;
 
     @Autowired
-    PrincipalExtractor principalExtractor;
+    private PrincipalExtractor principalExtractor;
 
 
     @Bean
